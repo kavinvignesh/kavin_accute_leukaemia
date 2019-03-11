@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 import array
 import csv
+import warnings
+warnings.filterwarnings("ignore")
 #loading and pruning the data
 dataset = genfromtxt('dataKMWS.csv', dtype = float, delimiter = ',')
 x = dataset[:,0:2] #Feature set
@@ -24,9 +26,10 @@ def plot_2D(data, target, target_names):
 		plt.scatter(data[target == i, 0],data[target ==i, 1], c = c, label = label)
 		plt.legend()
 # Classifying the data using a Linear SVM and predicting the probability of disease belonging to a particular class
-modelSVM = LinearSVC(C = 0.1)
+modelSVM = LinearSVC(C = 0.3)
 pca = PCA(n_components = 2, whiten = True).fit(x)
 x_new = pca.transform(x)
+print ("PCA transformation in the train data: "+str(x_new))
 #calling plot_2D
 plot_2D(x_new, y, target_names)
 plt.show()	
@@ -34,7 +37,7 @@ plt.show()
 x_train, x_test, y_train, y_test = train_test_split(x_new, y, test_size = 0.2, train_size = 0.8, random_state = 0)
 modelSVM = modelSVM.fit(x_train, y_train)
 print ("Linear SVC Accuracy: "+str(modelSVM.score(x_test, y_test)))
-modelSVMRaw = LinearSVC(C=0.1)
+modelSVMRaw = LinearSVC(C=0.3)
 modelSVMRaw = modelSVMRaw.fit(x_new, y)
 cnt = 0
 s = 0
@@ -43,12 +46,12 @@ for i in modelSVMRaw.predict(x_new):
 		cnt = cnt + 1
 	s = s+1
 #Applying the principal component analysis on the data features
-modelSVM2 = SVC(C = 0.1, kernel = 'rbf')
+modelSVM2 = SVC(C = 0.3, kernel = 'rbf')
 #Applying cross validation on the training and test set for validating our linear svm model
 x_train1, x_test1, y_train1, y_test1 = train_test_split(x_new, y, test_size=0.2, train_size=0.8, random_state=0)
 modelSVM2 = modelSVM2.fit(x_train1, y_train1)
 print ("RBF SVC Accuracy: "+str(modelSVM2.score(x_test1, y_test1)))
-modelSVMRaw = SVC(C=0.1, kernel = 'rbf')
+modelSVMRaw = SVC(C=0.3, kernel = 'rbf')
 modelSVMRaw = modelSVMRaw.fit(x_new, y)
 cnt1 = 0
 s = 0
@@ -63,7 +66,7 @@ print ("Test data: "+str(q))
 #b = dataset[:,3] #Label set
 ax = a.reshape(1, -1)
 svm = SVC(kernel='linear').fit(x_train, y_train)
-rbf_svc = SVC( gamma = 0.7).fit(x_train, y_train)
+rbf_svc = SVC( gamma='scale').fit(x_train, y_train)
 p = PCA(n_components = 2, whiten = True).fit(x)
 a_new = p.transform(ax)
 print ("PCA transformation in the test data: "+str(a_new))
